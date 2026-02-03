@@ -1,0 +1,5 @@
+Component,Requirement
+Renderer,WebGL (via Three.js)
+Language,Python (Wrapper) + JavaScript (Engine)
+Input,Event Listeners for Keyboard (WASD + QE)
+Performance,requestAnimationFrame for smooth 60fps rendering
