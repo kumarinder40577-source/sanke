@@ -5,7 +5,7 @@ import time
 # --- Setup & Constants ---
 pygame.init()
 try:
-    pygame.mixer.init() # For sounds
+    pygame.mixer.init()
 except:
     print("Audio device not found, continuing without sound.")
 
@@ -24,19 +24,21 @@ clock = pygame.time.Clock()
 snake_block = 20
 initial_speed = 10
 
-# Fonts - Using default if specific fonts aren't found
-font_style = pygame.font.SysFont(None, 35)
-score_font = pygame.font.SysFont(None, 45)
-emoji_font = pygame.font.SysFont("segoeuiemoji", 30)
+# Fonts
+font_style = pygame.font.SysFont("arial", 25)
+score_font = pygame.font.SysFont("arial", 35)
+# Note: Emojis require specific font support on some systems
+emoji_font = pygame.font.SysFont("segoe ui emoji", 30)
 
 SNACKS = ["🍕", "🍔", "🌮", "🍩", "🥨"]
 
 def display_score(score):
-    value = score_font.render(f"Calories: {score}", True, YELLOW)
+    value = score_font.render(f"Calories Gained: {score}", True, YELLOW)
     dis.blit(value, [10, 10])
 
 def draw_snake(snake_block, snake_list):
     for i, x in enumerate(snake_list):
+        # Head is different from body
         content = "😋" if i == len(snake_list)-1 else "🟢"
         char = emoji_font.render(content, True, WHITE)
         dis.blit(char, [x[0], x[1]])
@@ -63,7 +65,7 @@ def gameLoop():
     while not game_over:
         while game_close:
             dis.fill(BLACK)
-            message("Food Coma! Press C-Play Again or Q-Quit", RED)
+            message("Ugh, Food Coma! Press C-Play Again or Q-Quit", RED)
             display_score(Length_of_snake - 1)
             pygame.display.update()
 
@@ -92,6 +94,7 @@ def gameLoop():
                     y1_change = snake_block
                     x1_change = 0
 
+        # Boundary collision
         if x1 >= WIDTH or x1 < 0 or y1 >= HEIGHT or y1 < 0:
             game_close = True
         
@@ -99,6 +102,7 @@ def gameLoop():
         y1 += y1_change
         dis.fill(BLACK)
 
+        # Draw Snack
         snack_txt = emoji_font.render(snack_type, True, WHITE)
         dis.blit(snack_txt, [foodx, foody])
 
@@ -107,9 +111,32 @@ def gameLoop():
         if len(snake_List) > Length_of_snake:
             del snake_List[0]
 
+        # Self collision
         for x in snake_List[:-1]:
             if x == snake_Head:
                 game_close = True
 
         draw_snake(snake_block, snake_List)
-        display_score(Length_
+        display_score(Length_of_snake - 1)
+        pygame.display.update()
+
+        # Eat snack
+        if x1 == foodx and y1 == foody:
+            print("\a") # PC Beep sound
+            foodx = round(random.randrange(0, WIDTH - snake_block) / 20.0) * 20.0
+            foody = round(random.randrange(0, HEIGHT - snake_block) / 20.0) * 20.0
+            
+            # Sugar Rush Mechanic
+            if snack_type == "🍩":
+                current_speed += 2 
+            
+            snack_type = random.choice(SNACKS)
+            Length_of_snake += 1
+
+        clock.tick(current_speed)
+
+    pygame.quit()
+    quit()
+
+if __name__ == "__main__":
+    gameLoop()
